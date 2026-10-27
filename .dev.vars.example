@@ -1,0 +1,2 @@
+# 本機開發時略過 Cloudflare Access 驗證（不會被部署到線上）
+ALLOW_NO_AUTH=true

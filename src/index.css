@@ -1,0 +1,829 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+
+/* ══ 風格：shadcn/ui（base-nova 預設，元件都是 Base UI、neutral 色系）════════
+   顏色、圓角、字體都只用 shadcn 的 token；元件在 src/components/ui。
+   深色模式跟著系統設定，所以 dark: 變體也改成看系統。 */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 1rem;
+  /* WunderUI 按鈕：控制項的高度／左右內距（compact 密度）與動畫時間 */
+  --border-control: var(--border);
+  --control-sm: 2rem;
+  --control-md: 2.25rem;
+  --control-lg: 2.5rem;
+  --control-xl: 2.75rem;
+  --control-2xl: 3rem;
+  --control-px-sm: 0.75rem;
+  --control-px-md: 0.875rem;
+  --control-px-lg: 1rem;
+  --control-px-xl: 1.125rem;
+  --control-px-2xl: 1.25rem;
+  --duration-fast: 150ms;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  /* Bencho 元件要用 rgba() 組前景色，給它三個數字（約等於 --foreground） */
+  --foreground-rgb: 10, 10, 10;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+    --foreground-rgb: 250, 250, 250;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-border-control: var(--border-control);
+  --ease-entrance: cubic-bezier(0.2, 0, 0, 1);
+  --font-sans: 'Geist Variable', 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Tailwind v4 把按鈕游標改回預設；可點的東西都要是手指，並去掉觸控的 300ms 延遲 */
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  [role='checkbox'],
+  summary,
+  input[type='date'] {
+    cursor: pointer;
+  }
+  button,
+  a,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+  /* 不是 shadcn 元件的可聚焦元素（連結、日曆裡的按鈕）也要看得到焦點 */
+  a:focus-visible,
+  [role='button']:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* 鍵盤使用者可以跳過側邊欄直接到主內容 */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* 減少動態：拿掉所有過渡和位移 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- FullCalendar 主題（shadcn token）---------- */
+.fc {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--card);
+  --fc-neutral-bg-color: var(--muted);
+  --fc-today-bg-color: color-mix(in oklch, var(--muted) 60%, transparent);
+  --fc-now-indicator-color: var(--destructive);
+  --fc-list-event-hover-bg-color: var(--muted);
+  --fc-highlight-color: color-mix(in oklch, var(--foreground) 6%, transparent);
+  --fc-event-border-color: transparent;
+  font-size: 0.875rem;
+}
+.fc a {
+  color: inherit;
+  text-decoration: none;
+}
+.fc .fc-toolbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+/* 工具列按鈕照 shadcn 的 outline 按鈕；選到的檢視是 primary */
+.fc .fc-button {
+  height: 2rem;
+  padding: 0 0.625rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) !important;
+  box-shadow: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fc .fc-button:hover:not(:disabled) {
+  color: var(--foreground);
+  background: var(--muted);
+  border-color: var(--border);
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.fc .fc-button:disabled {
+  color: var(--foreground);
+  background: var(--background);
+  border-color: var(--border);
+  opacity: 0.5;
+}
+.fc .fc-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent) !important;
+}
+.fc .fc-button-group {
+  gap: 4px;
+}
+.fc .fc-button-group > .fc-button {
+  margin: 0 !important;
+}
+.fc .fc-col-header-cell-cushion {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 8px 4px;
+}
+.fc .fc-daygrid-day-number {
+  font-size: 13px;
+  padding: 4px 8px;
+}
+/* 今天的日期是一顆 primary 小圓 */
+.fc .fc-day-today .fc-daygrid-day-number {
+  margin: 4px 4px 0 0;
+  padding: 0 7px;
+  min-width: 24px;
+  line-height: 24px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-radius: 999px;
+}
+.fc .fc-timegrid-slot {
+  height: 1.2rem;
+}
+/* 週／日檢視一眼看完：不顯示捲軸；極矮的螢幕放不下時仍可用手勢捲動，不會裁掉內容 */
+.fc .fc-timegrid .fc-scroller {
+  scrollbar-width: none;
+}
+.fc .fc-timegrid .fc-scroller::-webkit-scrollbar {
+  display: none;
+}
+/* 時段格高度只由 height 決定，不被繼承的行高撐開 */
+.fc .fc-timegrid-slots {
+  line-height: 1;
+}
+@media (max-width: 640px) {
+  .fc .fc-timegrid-slot {
+    height: 0.9rem;
+  }
+  .fc .fc-timegrid-slot-label-cushion {
+    font-size: 11px;
+    line-height: 1;
+  }
+  .fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 0.6rem;
+  }
+  .fc .fc-toolbar.fc-footer-toolbar {
+    margin-top: 0.6rem;
+  }
+}
+.fc .fc-timegrid-slot-label-cushion,
+.fc .fc-timegrid-axis-cushion,
+.fc .fc-event-time {
+  font-variant-numeric: tabular-nums;
+}
+.fc-event {
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+.fc-event.is-done {
+  opacity: 0.45;
+}
+.fc-event.is-done .fc-event-title {
+  text-decoration: line-through;
+}
+.fc .fc-scrollgrid {
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  overflow: hidden;
+}
+.fc .fc-list {
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  overflow: hidden;
+}
+.fc .fc-list-day-cushion {
+  background: var(--muted);
+}
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    gap: 0.5rem;
+  }
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+  }
+}
+/* 週／日檢視的全天任務：淡色背景墊在後面，標題是可以點的小膠囊，同一天多個就往下排 */
+.fc .fc-bg-event.is-span {
+  opacity: 1;
+  background: color-mix(in srgb, var(--span-color) 10%, transparent) !important;
+}
+/* 已完成的不上底色，同一天有好幾個時顏色才不會疊得太深 */
+.fc .fc-bg-event.is-span.is-done {
+  background: transparent !important;
+}
+.fc .fc-bg-event.is-span .fc-event-title {
+  position: relative;
+  z-index: 4;
+  margin: calc(3px + var(--span-index, 0) * 22px) 3px 0;
+  padding: 1px 6px;
+  overflow: hidden;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 18px;
+  color: #fff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  background: var(--span-color);
+  border-radius: 999px;
+  pointer-events: auto;
+}
+.fc .fc-bg-event.is-span.is-done .fc-event-title {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+/* 週曆／日曆的任務區塊：左右留一樣寬，文字跟邊緣保持距離 */
+.fc .fc-timegrid-col-events {
+  margin: 0 3px;
+}
+.fc .fc-timegrid-event .fc-event-main {
+  padding: 4px 7px;
+}
+.fc .fc-timegrid-event .fc-event-title {
+  line-height: 1.3;
+}
+/* 單行（很短的任務）和多行用同一套字級、字重：時間小一號、標題正常大小 */
+.fc .fc-timegrid-event .fc-event-time {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  opacity: 0.9;
+}
+.fc .fc-timegrid-event .fc-event-title,
+.fc .fc-timegrid-event-short .fc-event-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+/* 單行時時間和標題排在同一行：用間距取代預設的「 - 」，上下置中 */
+.fc .fc-timegrid-event-short .fc-event-main {
+  display: flex;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.fc .fc-timegrid-event-short .fc-event-main-frame {
+  align-items: baseline;
+  gap: 6px;
+}
+.fc .fc-timegrid-event-short .fc-event-time {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+/* 單行放不下就用 … 收尾，不要換行被切掉 */
+.fc .fc-timegrid-event-short .fc-event-title-container {
+  min-width: 0;
+}
+.fc .fc-timegrid-event-short .fc-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fc .fc-timegrid-event-short .fc-event-time::after {
+  content: none;
+}
+/* 月曆裡整條顯示的任務也一樣留邊 */
+.fc .fc-daygrid-block-event .fc-event-main {
+  padding: 1px 6px;
+}
+
+/* ══ Bencho 元件（MIT, bencho.dev/licence）══════════════════
+   它們讀的是 Bencho 自己的 token，這裡在元件根上對應到本專案的
+   墨色、面板色、細線和字體，不另開全域變數。-rgb 要三個數字，
+   因為 CSS 拿它組 rgba()，所以用逗號分隔、深色模式另外給。 */
+.chk,
+.task-check {
+  --ink: var(--foreground);
+  --ink-rgb: var(--foreground-rgb);
+  --card: var(--background);
+  --fill-on: var(--foreground);
+  --fill-on-rgb: var(--foreground-rgb);
+  --fill-slab: var(--background);
+  --pane-edge: var(--border);
+  --font-ui: var(--font-sans);
+}
+
+.chk {
+  box-sizing: border-box;
+  /* ── it opens, it does not jump ──────────────────────────
+     One row taller when you add a task, over a third of a
+     second. The component states its height rather than
+     letting the rows add up to it, which is what gives this
+     something to interpolate.
+
+     WITH THE OVERFLOW CLIPPED, which is what makes it read as
+     the card opening rather than as a box being resized around
+     things already sitting outside it: the new task takes the
+     empty slot the spare row was in, and the spare row is
+     revealed as the card grows to make it a new one. */
+  overflow: hidden;
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* the rows are in flow and stay in flow — the fall is a
+     transform on each of them, so nothing here is positioned.
+     What this is for now is the stacking context the heap's
+     z-order needs. */
+  position: relative;
+  background: var(--fill-slab, var(--card));
+  font-family: var(--font-ui);
+  color: var(--fill-on, var(--ink));}
+
+/* the hairline is the Stroke control's to give, the way it is
+   for every other block — a spread shadow rather than a
+   border, so it costs the card no layout */
+[data-stroke="on"] .chk {
+  box-shadow: 0 0 0 1px var(--pane-edge);}
+
+.chk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* so the heap can be ordered. Rows land on each other and
+     the one that lands LAST is the top of the pile, which is
+     the opposite of the DOM order they are written in. */
+  position: relative;
+  /* NOTHING at the sides: the card's own padding is the inset,
+     and a second one here would put the box further in than
+     the card's edge says it is */
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* the ROW is the target, not the box. A 22px checkbox is a
+     22px hit area, and the words beside it are the part
+     anybody actually points at */
+  -webkit-tap-highlight-color: transparent;}
+
+/* ── the spare row ─────────────────────────────────────────
+   The one thing in this card that is not a task, and it has
+   to read that way at a glance or it is a fourth item you
+   have not ticked yet. So: the same geometry as a row, and a
+   third of the ink. It comes up on hover, and the field it
+   turns into sits at full strength — you are writing in it by
+   then, and a placeholder that stays faint while you type
+   reads as broken. */
+.chk-add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* ── the same type as a task, set ONCE on the row ────────
+     Both the label and the field it turns into say `font:
+     inherit`, which was inheriting the card's — 16px at 400
+     with no tracking, against a task's 14 at 450. Next to
+     three lines of the smaller face the placeholder read as a
+     heading rather than as the next line of the list.
+
+     It goes on the row rather than on each of them because a
+     button and an input are the same line of text at two
+     moments, and a size stated twice is a size that will
+     disagree with itself later. See .chk-say, which is where
+     these three numbers come from. */
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: opacity 220ms ease;}
+
+/* it keeps its space while the heap is down — removing it
+   would change the card's height in the middle of a fall */
+.chk-add[data-hide] {
+  opacity: 0;
+  pointer-events: none;}
+
+/* the box that is not a checkbox: the ring at a fraction of
+   its strength and nothing inside it. No dashes — a dashed
+   outline is a second idea about what "empty" looks like, and
+   this card already has one that works. */
+.chk-ghost {
+  flex: none;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.16);}
+
+.chk-new {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.34;
+  transition: opacity 160ms ease;}
+
+.chk-new:hover { opacity: 0.62; }
+
+.chk-field {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  outline: none;}
+
+.chk-field::placeholder {
+  color: color-mix(in srgb, var(--fill-on, #17181a) 32%, var(--fill-slab, #ffffff));}
+
+/* ── on the floor ──────────────────────────────────────────
+   Opaque, and only once it has fallen. A row is a transparent
+   button for its whole life until the three of them are lying
+   against each other, and at that point transparency means two
+   tasks reading through each other at three degrees of
+   rotation — a mess rather than a heap.
+
+   ON A PSEUDO-ELEMENT, and inset, because the row's own box is
+   not the object that falls. A row is 40px tall so that the
+   whole line is a target; what you can SEE in it is about
+   twenty. Painting the full 40 and then stacking the slips
+   tight enough to touch means each one covers the top of the
+   words below it. The slip is the visible part — the
+   component sends its own inset down as --slip, since only it
+   knows how big the Box knob has made the contents.
+
+   Behind the words, not over them: the row carries a z-index
+   while it is fallen, which makes it a stacking context, so a
+   negative one here lands under its own contents and nothing
+   else. */
+.chk-row[data-fell]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--slip, 9px);
+  bottom: var(--slip, 9px);
+  border-radius: 10px;
+  background: var(--fill-slab, var(--card));
+  z-index: -1;}
+
+.chk-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.4);}
+
+/* ── the box ────────────────────────────────────────────────
+   The ring never changes. It is drawn once, at rest, and the
+   fill opens inside it — so what you see is a box being
+   filled in rather than one colour being swapped for another.
+   `overflow: hidden` is what keeps the fill's overshoot
+   inside the ring instead of past it. */
+.chk-box {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.28);}
+
+.chk-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fill-on, var(--ink));
+  /* from the middle out — an origin at a corner would read as
+     a panel sliding in rather than as the box filling */
+  transform-origin: center;}
+
+/* ── the tick ───────────────────────────────────────────────
+   Drawn rather than faded: `stroke-dashoffset` walks the
+   stroke on from its start, so the mark is made the way a
+   person makes it. It sits ON the fill and takes the fill's
+   own ground colour, which is why it can be full strength and
+   still be invisible until there is something under it. */
+.chk-tick {
+  position: relative;
+  width: 68%;
+  height: 68%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--fill-slab, var(--card));
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;}
+
+.chk-say {
+  position: relative;
+  /* sized to the WORDS, not to the row: the rule is a scale of
+     this box, so a full-width span would strike out the empty
+     half of the line as well */
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;}
+
+.chk-word { display: inline-block; }
+
+.chk-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* on the type's own middle rather than the box's — a rule
+     centred on a line box sits low, because the box carries
+     the descender space and the letters do not */
+  top: 46%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transform-origin: left center;
+  pointer-events: none;}
+
+/* ── 任務列借用 Checklist 的勾選 ────────────────────────────
+   同一個 spring 讀出填色、打勾、刪除線和淡出；環和填色用重要程度
+   的顏色（無重要程度就是墨色），勾用面板色畫在填色上。 */
+.task-check {
+  --fill-on: var(--check);
+  --fill-slab: var(--background);
+}
+.task-check .chk-box {
+  box-shadow: inset 0 0 0 2px var(--check);
+}
+
+
+
+/* ══ Eye tracker ═══════════════════════════════════════════
+   See src/components/bencho/EyeTracker.tsx. The frame holds the largest ball the
+   Size knob allows, so the wall never rescales it. */
+/* Bencho 的 token 對到本專案：墨色是 foreground、底色是 background、
+   面板是 card、字體是 font-sans。只在元件根上設，不外漏。 */
+.eyt {
+  --bg: var(--background);
+  --card: var(--card);
+  --ink: var(--foreground);
+  --fill-on: var(--foreground);
+  --fill-slab: var(--background);
+  --font-ui: var(--font-sans);
+}
+.eyt {
+  width: 200px;
+  height: 200px;
+  display: grid;
+  place-items: center;}
+
+.eyt-ball {
+  width: var(--eyt-size, 100px);
+  height: var(--eyt-size, 100px);
+  overflow: visible;}
+
+/* the ball is the Fill's own slab and the eyes its ink: white
+   with dark eyes on a light fill, near-black with light eyes on
+   a dark one */
+.eyt-body { fill: var(--fill-slab, #ffffff); }
+
+.eyt-eye { fill: var(--fill-on, #0b0b0d); }
+
+/* a press on the toy opens a chat bubble off its lower right: the
+   pet's bubble, its square corner pointing back at the face */
+.eyt { position: relative; }
+
+/* a press gives a little under the finger and springs back out */
+.eyt-ball[data-poke] {
+  cursor: pointer;
+  transform-origin: center;
+  transition: scale 420ms cubic-bezier(0.24, 1.34, 0.38, 1);
+  -webkit-tap-highlight-color: transparent;}
+
+.eyt-ball[data-poke]:active { scale: 0.96; transition-duration: 160ms; transition-timing-function: ease; }
+
+.eyt-say {
+  position: absolute;
+  left: calc(50% + var(--eyt-size, 100px) * 0.36);
+  top: calc(50% + var(--eyt-size, 100px) * 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: 6px 14px 14px 14px;
+  background: var(--tint, #3b5bff);
+  box-shadow: inset 0 -1.5px 0 rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  transform-origin: top left;
+  opacity: 0;
+  scale: 0.85;
+  pointer-events: none;
+  transition: opacity 160ms ease, scale 220ms cubic-bezier(0.24, 1.34, 0.38, 1), background-color 220ms ease;
+  letter-spacing: 0em;}
+
+.eyt-say[data-on] { opacity: 1; scale: 1; }
+
+.eyt-caret {
+  width: 1.5px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--fill-slab, var(--card));
+  animation: pet-caret 1s steps(1) infinite;}
+
+/* 側邊欄左上角的 logo：照 Bencho 自己 logo 的做法（原本的 .logo-test），
+   框跟著球的大小、身體用墨色、眼睛用底色，和舊的 icon.svg 一樣是墨色方塊。
+   深色模式 token 自己會換，不用另寫。泡泡要蓋在下面的按鈕上。 */
+.brand-mark .eyt { width: auto; height: auto; }
+
+.brand-mark .eyt-body { fill: var(--ink); }
+
+.brand-mark .eyt-eye { fill: var(--bg); }
+
+.brand-mark .eyt-say { z-index: 50; }
+
+@keyframes pet-caret {
+  50% { opacity: 0; }}
+
+/* 日曆右上角的 RubberSegment 是疊上去的，FullCalendar 工具列右邊那格
+   留同樣寬的空位，標題才會跟原本一樣置中 */
+.cal-card { --cal-segment-w: 220px; }
+@media (min-width: 768px) {
+  .cal-card .fc-header-toolbar .fc-toolbar-chunk:last-child { width: var(--cal-segment-w); }
+}
+/* 左右並排時切換移到右邊欄了，工具列不用再留位置；左右兩塊一樣寬，標題才會在正中間 */
+@container (width >= 900px) {
+  .cal-card .fc-header-toolbar .fc-toolbar-chunk:not(:nth-child(2)) { flex: 1 1 0; width: auto; }
+}
+
+/* 任務列外面包了 SwipeRow：滑鼠移上去跟原本一樣變淡灰，
+   列和列之間留原本的 2px */
+.task-swipe .swipe-row__surface { padding: 0 12px; transition: background-color 150ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .task-swipe:not([data-dragging]) .swipe-row__surface:hover { background: var(--muted); }
+}
+/* 抽屜關著的時候整片藏在列底下，但圓角的反鋸齒會讓它的深色邊從右側
+   兩個角透出來（每列右邊一小道弧線）。關著就把抽屜藏起來；
+   收回時晚 0.35 秒才藏，讓它陪著列滑回去 */
+.task-swipe .swipe-row__rail { visibility: visible; }
+/* 習慣頁點到、正在右邊欄顯示的那一列 */
+.task-swipe.is-picked .swipe-row__surface { background: color-mix(in oklch, var(--foreground) 7%, var(--card)); }
+.task-swipe:not([data-open]):not([data-dragging]):not([data-phase='committing']) .swipe-row__rail {
+  visibility: hidden;
+  transition: visibility 0s linear 350ms;
+}
+
+/* 日曆點選：選到的那天整格／整欄淡淡標一下，選到的事件加一圈外框。
+   點空白處不再新增任務，所以游標也不用是十字 */
+.fc .fc-daygrid-day.is-picked,
+.fc .fc-timegrid-col.is-picked {
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+.fc .fc-daygrid-day.is-picked .fc-daygrid-day-number { font-weight: 600; }
+.fc .fc-event.is-picked {
+  outline: 2px solid var(--foreground);
+  outline-offset: 1px;
+  z-index: 5;
+}
+.fc .fc-daygrid-day-frame,
+.fc .fc-timegrid-col-frame { cursor: pointer; }
+
+/* 側邊欄選到的那一項：比 hover 深得多的灰底加粗體，一眼看得出現在在哪一頁。
+   hover 時維持同樣的底色，不會變淡 */
+.nav-active,
+.nav-active:hover {
+  background: color-mix(in oklch, var(--foreground) 11%, transparent);
+}
