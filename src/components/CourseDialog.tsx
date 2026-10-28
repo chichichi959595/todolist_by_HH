@@ -6,32 +6,48 @@ import { toDateStr, todayStr, WEEKDAY_LABELS, WEEKDAY_ORDER } from '../lib/date'
 import { useCourseMutations, useCourses, useSemester } from '../lib/queries'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ChoiceCombobox } from '@/components/ui/choice-combobox'
 import { PlusIcon, XIcon } from './icons'
 import { Field, FormActions, Modal } from './Modal'
 
-/** 09:10–21:10，每 5 分鐘一格 */
-const TIME_OPTIONS = Array.from({ length: 12 * 12 + 1 }, (_, i) => {
-  const m = 9 * 60 + 10 + i * 5
-  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
-})
+const pad = (n: number) => String(n).padStart(2, '0')
+const toChoices = (values: string[]) => values.map((v) => ({ value: v, label: v }))
 
-/** 用下拉選單選時間：比 type=time 窄，也不會顯示上午／下午 */
+/** 課表的範圍是 09:10–21:10：時 09–21，分每 5 分鐘一格；組合超出範圍由表單檢查擋下 */
+const HOURS = Array.from({ length: 13 }, (_, i) => pad(9 + i))
+const MINUTES = Array.from({ length: 12 }, (_, i) => pad(i * 5))
+
+const WEEKDAY_CHOICES = WEEKDAY_ORDER.map((d) => ({ value: String(d), label: WEEKDAY_LABELS[d] }))
+
+/** 時跟分分開選；舊資料不在選項裡的值（例如 09:07）也保留在清單最前面 */
 function TimeSelect({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  const options = TIME_OPTIONS.includes(value) ? TIME_OPTIONS : [value, ...TIME_OPTIONS]
+  const [h, m] = value.split(':')
+  const hours = HOURS.includes(h) ? HOURS : [h, ...HOURS]
+  const minutes = MINUTES.includes(m) ? MINUTES : [m, ...MINUTES]
   return (
-    <Select value={value} onValueChange={(v) => v && onChange(v)}>
-      <SelectTrigger aria-label={label} className="min-w-0 flex-1 tabular-nums">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="max-h-72">
-        {options.map((t) => (
-          <SelectItem key={t} value={t} className="tabular-nums">
-            {t}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-1">
+      <ChoiceCombobox
+        compact
+        className="w-14"
+        label={`${label}（時）`}
+        items={toChoices(hours)}
+        value={h}
+        onChange={(v) => onChange(`${v}:${m}`)}
+        empty="無"
+      />
+      <span aria-hidden="true" className="text-muted-foreground">
+        :
+      </span>
+      <ChoiceCombobox
+        compact
+        className="w-14"
+        label={`${label}（分）`}
+        items={toChoices(minutes)}
+        value={m}
+        onChange={(v) => onChange(`${h}:${v}`)}
+        empty="無"
+      />
+    </div>
   )
 }
 
@@ -168,18 +184,15 @@ function CourseForm({
         <ul className="grid gap-2">
           {sessions.map((s, i) => (
             <li key={i} className="flex items-center gap-2">
-              <Select value={String(s.weekday)} onValueChange={(v) => setSession(i, { weekday: Number(v) })}>
-                <SelectTrigger aria-label="星期" className="w-[4.5rem] shrink-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {WEEKDAY_ORDER.map((d) => (
-                    <SelectItem key={d} value={String(d)}>
-                      {WEEKDAY_LABELS[d]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ChoiceCombobox
+                compact
+                className="w-14 shrink-0"
+                label="星期"
+                items={WEEKDAY_CHOICES}
+                value={String(s.weekday)}
+                onChange={(v) => setSession(i, { weekday: Number(v) })}
+                empty="無"
+              />
               <TimeSelect label="開始時間" value={s.startTime} onChange={(startTime) => setSession(i, { startTime })} />
               <span aria-hidden="true" className="text-muted-foreground">
                 –

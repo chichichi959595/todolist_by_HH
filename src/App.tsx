@@ -141,6 +141,10 @@ export function App() {
     },
   ]
 
+  // 手機下方欄：今天放中間，左邊日曆、右邊習慣／課表
+  const [todayItem, calendarItem, routineItem] = navItems
+  const mobileNavItems = [calendarItem, todayItem, routineItem]
+
   return (
     <div className="flex h-dvh overflow-hidden bg-background text-foreground">
       <a
@@ -254,7 +258,8 @@ export function App() {
         {/* 只有右邊的主內容換頁時淡入淡出，側邊欄不動。
             Suspense 包在外面：第一次進月曆還在載程式時，舊頁面留著，載好才直接淡到月曆，不會先閃「載入中」 */}
         <Suspense fallback={<p className="p-8 text-sm text-muted-foreground">載入中…</p>}>
-          <PageTransition effect="fade" pageKey={pageKey} className="h-full">
+          {/* 手機版不能鎖成 h-full：內容比畫面長時會溢出這層，main 底部留給下方欄的空間就疊在內容上，滑不到最底 */}
+          <PageTransition effect="fade" pageKey={pageKey} className="min-h-full md:h-full">
             {view === 'today' && <TodayView />}
             {view === 'category' && categoryId !== null && <CategoryView key={categoryId} categoryId={categoryId} />}
             {view === 'calendar' && <CalendarView mode={calendarMode} onModeChange={changeCalendarMode} />}
@@ -268,7 +273,7 @@ export function App() {
         aria-label="主要頁面"
         className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-3 gap-1 rounded-2xl border bg-background p-1 shadow-lg md:hidden"
       >
-        {navItems.map(({ view: v, label, Icon, active }, i) => (
+        {mobileNavItems.map(({ view: v, label, Icon, active }, i) => (
           <Button
             key={i}
             nativeButton={false}

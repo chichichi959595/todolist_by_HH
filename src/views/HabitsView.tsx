@@ -36,6 +36,8 @@ export function HabitsView() {
       <div className="@container flex flex-col rounded-2xl border bg-card p-4 text-card-foreground shadow-xs md:min-h-0 md:flex-1 md:overflow-y-auto md:p-6">
         <div className="flex min-h-0 flex-1 flex-col gap-6 @min-[900px]:flex-row">
           <div className="min-w-0 flex-1 @min-[900px]:overflow-y-auto">
+            {/* 手機版不顯示「星期X」標題，星期切換移到最上面取代它 */}
+            <WeekdaySegment day={day} onChange={setDay} className="mb-4 md:hidden" />
             {isPending ? (
               <p className="px-3 text-muted-foreground">載入中…</p>
             ) : active.length === 0 ? (
@@ -65,18 +67,7 @@ export function HabitsView() {
                 新增習慣
               </Button>
             </div>
-            <RubberSegment
-              className="mb-4 w-full"
-              items={WEEKDAY_ORDER.map((d) => ({ value: String(d), label: WEEKDAY_LABELS[d] }))}
-              value={String(day)}
-              onChange={(v) => setDay(Number(v))}
-              trackColor="var(--muted)"
-              thumbColor="var(--primary)"
-              textColor="var(--foreground)"
-              activeTextColor="var(--primary-foreground)"
-              radius={12}
-              aria-label="星期"
-            />
+            <WeekdaySegment day={day} onChange={setDay} className="mb-4 max-md:hidden" />
             {picked ? (
               <HabitDetail habit={picked} today={today} onEdit={() => setDialog({ habit: picked })} />
             ) : (
@@ -89,6 +80,26 @@ export function HabitsView() {
       </div>
 
       <HabitDialog open={dialog !== null} onClose={() => setDialog(null)} habit={dialog?.habit} />
+    </div>
+  )
+}
+
+/** className 放在外層：RubberSegment 自己的 CSS 有 display，會蓋掉 Tailwind 的 hidden */
+function WeekdaySegment({ day, onChange, className }: { day: number; onChange: (day: number) => void; className?: string }) {
+  return (
+    <div className={className}>
+      <RubberSegment
+        className="w-full"
+        items={WEEKDAY_ORDER.map((d) => ({ value: String(d), label: WEEKDAY_LABELS[d] }))}
+        value={String(day)}
+        onChange={(v) => onChange(Number(v))}
+        trackColor="var(--muted)"
+        thumbColor="var(--primary)"
+        textColor="var(--foreground)"
+        activeTextColor="var(--primary-foreground)"
+        radius={12}
+        aria-label="星期"
+      />
     </div>
   )
 }
@@ -111,7 +122,7 @@ function HabitSection({
   return (
     <section>
       {/* 寬版時標題跟右邊的新增鈕同一行，整塊高度等於「新增鈕＋星期切換」，讓第一條習慣跟右邊卡片上緣對齊 */}
-      <div className="mb-3 px-3 @min-[900px]:mb-0 @min-[900px]:h-25">
+      <div className="mb-3 px-3 max-md:hidden @min-[900px]:mb-0 @min-[900px]:h-25">
         <h2 className="flex items-center text-lg font-semibold tracking-tight @min-[900px]:h-9">{title}</h2>
         <p className="text-sm text-muted-foreground">總共 {habits.length} 條習慣</p>
       </div>

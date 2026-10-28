@@ -6,7 +6,7 @@ import { ColorPicker } from './ColorPicker'
 import { HABIT_COLORS } from './HabitDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ChoiceCombobox } from '@/components/ui/choice-combobox'
 import { Field, FormActions, Modal } from './Modal'
 import FuseButton from './reactbits/FuseButton'
 
@@ -84,24 +84,17 @@ function CategoryForm({
       </Field>
 
       <Field label="連接課程" group>
-        <Select
+        <ChoiceCombobox
+          label="連接課程"
+          // 課程的點用這個分類現在的顏色：連上之後課表上就會是這個顏色
+          items={[
+            { value: 'none', label: '不連接', color: 'var(--muted-foreground)' },
+            ...linkable.map((c) => ({ value: String(c.id), label: c.name, color })),
+          ]}
           value={courseId === null ? 'none' : String(courseId)}
-          onValueChange={(v) => v && setCourseId(v === 'none' ? null : Number(v))}
-          // Base UI 的 SelectValue 要靠 items 才知道值對應的文字（不然會直接顯示 id）
-          items={[{ value: 'none', label: '不連接' }, ...linkable.map((c) => ({ value: String(c.id), label: c.name }))]}
-        >
-          <SelectTrigger className="w-full" aria-label="連接課程">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">不連接</SelectItem>
-            {linkable.map((course) => (
-              <SelectItem key={course.id} value={String(course.id)}>
-                {course.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          onChange={(v) => setCourseId(v === 'none' ? null : Number(v))}
+          empty="找不到這門課"
+        />
         <p className="text-sm text-muted-foreground">連接後，課表和日曆上的這門課會用這個分類的顏色</p>
       </Field>
 
