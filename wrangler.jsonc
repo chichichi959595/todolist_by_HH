@@ -13,7 +13,7 @@
       "binding": "DB",
       "database_name": "todolist-db",
       // 執行 `pnpm exec wrangler d1 create todolist-db` 後，把拿到的 id 貼在這裡
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "database_id": "04896961-4b6a-424d-b281-b9d7440eb5d3",
       "migrations_dir": "drizzle"
     }
   ],
