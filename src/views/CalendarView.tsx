@@ -26,6 +26,7 @@ import { TaskDialog } from '../components/TaskDialog'
 import { useCourseColor } from '../lib/courses'
 import { PRIORITIES, toDateStr, todayStr, WEEKDAY_LABELS } from '../lib/date'
 import { useCategories, useCourses, useRangeTasks, useTaskMutations } from '../lib/queries'
+import { isOvernight, taskTimeLabel } from '../lib/taskTime'
 
 const VIEWS = 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
 
@@ -144,7 +145,12 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
           ...base,
           title: t.title,
           start: t.startTime ? `${t.date}T${t.startTime}` : t.date!,
-          end: t.startTime && t.endTime ? `${t.date}T${t.endTime}` : undefined,
+          // 跨夜的任務結束在隔天；週／日看不到的 00:00–09:00 那段就不顯示，
+          // 月曆只放在開始那天，不拉成跨兩格的長條
+          end:
+            t.startTime && t.endTime && !(isOvernight(t) && mode === 'dayGridMonth')
+              ? `${isOvernight(t) ? toDateStr(addDays(parseISO(t.date!), 1)) : t.date}T${t.endTime}`
+              : undefined,
           allDay: !t.startTime,
         }
       })
@@ -234,11 +240,12 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
       : {
           date,
           startTime: format(start, 'HH:mm'),
-          // 原本沒有結束時間、只是被拖動的任務，維持沒有結束時間；跨日的話也不存
+          // 原本沒有結束時間、只是被拖動的任務，維持沒有結束時間；
+          // 跨到隔天的照樣存（結束早於開始就代表隔天），超過 24 小時才不存
           endTime:
             !task.endTime && !('endDelta' in info)
               ? null
-              : end && toDateStr(end) === date
+              : end && end.getTime() - start.getTime() < 24 * 60 * 60 * 1000
                 ? format(end, 'HH:mm')
                 : null,
         }
@@ -395,7 +402,7 @@ function DayPanel({
       .map((t) => ({
         key: `t-${t.id}`,
         start: t.startTime ?? '',
-        time: t.startTime ? `${t.startTime}${t.endTime ? `–${t.endTime}` : ''}` : '全天',
+        time: t.startTime ? taskTimeLabel(t) : '全天',
         title: t.title,
         sub: null as string | null,
         color: taskColor(t),

@@ -9,6 +9,7 @@ import type { Course, HabitWithStats, Task } from '../../shared/types'
 import { useCourseColor } from '../lib/courses'
 import { PRIORITIES, toDateStr, WEEKDAY_LABELS, WEEKDAY_ORDER } from '../lib/date'
 import { useCategories } from '../lib/queries'
+import { taskTimeLabel } from '../lib/taskTime'
 import { frequencyLabel } from './HabitDialog'
 import { NoteIcon, PencilIcon } from './icons'
 
@@ -45,7 +46,7 @@ export function TaskDetail({ task, onEdit, className }: { task: Task; onEdit: ()
       <dl className="mt-3 grid gap-1.5 text-[13px] tabular-nums">
         <Info label="時間">
           {task.date ? format(parseISO(task.date), 'M/d（EEEEE）', { locale: zhTW }) : '未排程'}{' '}
-          {task.date && (task.startTime ? `${task.startTime}${task.endTime ? `–${task.endTime}` : ''}` : '全天')}
+          {task.date && (task.startTime ? taskTimeLabel(task) : '全天')}
         </Info>
         {category && <Info label="分類">{category.name}</Info>}
         {task.priority > 0 && <Info label="重要程度">{PRIORITIES[task.priority]?.label}</Info>}

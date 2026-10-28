@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { SquarePenIcon, Trash2Icon } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { Habit, HabitWithStats } from '../../shared/types'
@@ -111,10 +110,11 @@ function HabitSection({
 }) {
   return (
     <section>
-      <h2 className="mb-3 flex items-center gap-2 px-3 text-lg font-semibold tracking-tight">
-        {title}
-        {habits.length > 0 && <Badge variant="secondary">{habits.length}</Badge>}
-      </h2>
+      {/* 寬版時標題跟右邊的新增鈕同一行，整塊高度等於「新增鈕＋星期切換」，讓第一條習慣跟右邊卡片上緣對齊 */}
+      <div className="mb-3 px-3 @min-[900px]:mb-0 @min-[900px]:h-25">
+        <h2 className="flex items-center text-lg font-semibold tracking-tight @min-[900px]:h-9">{title}</h2>
+        <p className="text-sm text-muted-foreground">總共 {habits.length} 條習慣</p>
+      </div>
       {habits.length === 0 ? (
         <p className="px-3 py-2 text-muted-foreground">{empty}</p>
       ) : (

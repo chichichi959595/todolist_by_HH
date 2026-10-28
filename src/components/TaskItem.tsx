@@ -4,6 +4,7 @@ import { SquarePenIcon, Trash2Icon } from 'lucide-react'
 import { formatShort, PRIORITIES } from '../lib/date'
 import { useCategories, useTaskMutations } from '../lib/queries'
 import { clamp, LAG, mix, RUN, stillness, useSpring } from '../lib/spring'
+import { taskTimeLabel } from '../lib/taskTime'
 import { NoteIcon } from './icons'
 import SwipeRow from './reactbits/SwipeRow'
 import { showToast } from './Toaster'
@@ -103,10 +104,7 @@ export function TaskItem({ task, onOpen, showDate, hideCategory, onEdit, selecte
               </span>
             )}
             {task.startTime && (
-              <span>
-                {task.startTime}
-                {task.endTime && `–${task.endTime}`}
-              </span>
+              <span>{taskTimeLabel(task)}</span>
             )}
             {showDate && task.date && <span>{formatShort(task.date)}</span>}
           </div>

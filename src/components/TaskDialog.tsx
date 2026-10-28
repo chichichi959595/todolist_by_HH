@@ -3,6 +3,7 @@ import type { TaskCreateInput } from '../../shared/schemas'
 import type { Task } from '../../shared/types'
 import { PRIORITIES } from '../lib/date'
 import { useCategories, useTaskMutations } from '../lib/queries'
+import { isOvernight } from '../lib/taskTime'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -52,7 +53,9 @@ function TaskForm({
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const timed = date !== '' && !allDay
-  const timeError = timed && endTime !== '' && endTime <= startTime ? '結束時間要晚於開始時間' : null
+  // 結束早於開始就是隔天結束（跨夜）；只有一樣的時間不行
+  const timeError = timed && endTime !== '' && endTime === startTime ? '結束時間不能跟開始時間一樣' : null
+  const overnight = timed && !timeError && isOvernight({ startTime, endTime: endTime || null })
   const canSubmit = title.trim() !== '' && !timeError
 
   function submit(e: FormEvent) {
@@ -106,7 +109,7 @@ function TaskForm({
           <Field label="開始">
             <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
           </Field>
-          <Field label="結束（選填）">
+          <Field label={overnight ? '結束（隔天）' : '結束（選填）'}>
             <Input
               type="time"
               value={endTime}
