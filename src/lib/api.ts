@@ -54,7 +54,8 @@ export const api = {
   // since：這台裝置今天 00:00，伺服器靠它挑出今天才完成的逾期／未排程任務
   tasksToday: (date: string) =>
     request<Task[]>(`/tasks/today?date=${date}&since=${encodeURIComponent(new Date(`${date}T00:00`).toISOString())}`),
-  tasksInCategory: (id: number) => request<Task[]>(`/tasks/category/${id}`),
+  // id 是 null 就是未分類
+  tasksInCategory: (id: number | null) => request<Task[]>(id === null ? '/tasks/uncategorized' : `/tasks/category/${id}`),
   createTask: (input: TaskCreateInput) => request<Task>('/tasks', json('POST', input)),
   updateTask: (id: number, patch: TaskUpdateInput) => request<Task>(`/tasks/${id}`, json('PATCH', patch)),
   deleteTask: (id: number) => request<{ ok: true }>(`/tasks/${id}`, json('DELETE')),

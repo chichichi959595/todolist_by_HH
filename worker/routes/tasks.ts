@@ -58,6 +58,12 @@ export const tasksRoute = new Hono<AppEnv>()
     return c.json(rows)
   })
 
+  // 未分類頁：沒有分類的所有任務
+  .get('/uncategorized', async (c) => {
+    const rows = await getDb(c.env).select().from(tasks).where(and(eq(tasks.userId, c.var.userId), isNull(tasks.categoryId))).orderBy(...order)
+    return c.json(rows)
+  })
+
   // 分類頁：這個分類的所有任務
   .get('/category/:id', validate('param', idParam), async (c) => {
     const { id } = c.req.valid('param')

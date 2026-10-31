@@ -54,10 +54,10 @@ const GLIDE_ITEM = 'hover:bg-transparent! dark:hover:bg-transparent!'
 
 const readHash = () => window.location.hash.slice(1)
 
-/** 網址 hash 對應的頁面；分類頁是 #category-<id> */
+/** 網址 hash 對應的頁面；分類頁是 #category-<id>，未分類是 #category-none（categoryId 為 null） */
 function parseHash(hash: string): { view: View | 'category'; categoryId: number | null } {
-  const match = /^category-(\d+)$/.exec(hash)
-  if (match) return { view: 'category', categoryId: Number(match[1]) }
+  const match = /^category-(\d+|none)$/.exec(hash)
+  if (match) return { view: 'category', categoryId: match[1] === 'none' ? null : Number(match[1]) }
   return { view: VIEWS.includes(hash as View) ? (hash as View) : 'today', categoryId: null }
 }
 
@@ -76,7 +76,7 @@ export function App() {
   const { view, categoryId } = parseHash(useHash())
 
   // 換頁畫好之後把焦點移到主內容，螢幕閱讀器才知道頁面換了（第一次進來不搶焦點）
-  const pageKey = view === 'category' ? `category-${categoryId}` : view
+  const pageKey = view === 'category' ? `category-${categoryId ?? 'none'}` : view
   const firstPage = useRef(true)
   useEffect(() => {
     if (firstPage.current) {
@@ -86,6 +86,7 @@ export function App() {
     document.getElementById('main')?.focus({ preventScroll: true })
   }, [pageKey])
   const { data: categories = [] } = useCategories()
+  const uncategorizedActive = view === 'category' && categoryId === null
   const [creating, setCreating] = useState<'task' | 'habit' | 'category' | null>(null)
   const [calendarMode, setCalendarMode] = useState(
     () =>
@@ -243,6 +244,20 @@ export function App() {
                 </Button>
               )
             })}
+            {/* 沒有分類的任務都在這裡 */}
+            <Button
+              data-glide
+              nativeButton={false}
+              render={<a href="#category-none" aria-current={uncategorizedActive ? 'page' : undefined} />}
+              variant="ghost"
+              className={cn(
+                'relative h-8 w-full justify-start gap-2.5 px-2.5 font-normal',
+                uncategorizedActive ? 'nav-active font-semibold text-foreground' : GLIDE_ITEM,
+              )}
+            >
+              <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full border-2 border-muted-foreground/50" />
+              <span className="truncate">未分類</span>
+            </Button>
             </GlideList>
           </nav>
         </div>
@@ -261,7 +276,7 @@ export function App() {
           {/* 手機版不能鎖成 h-full：內容比畫面長時會溢出這層，main 底部留給下方欄的空間就疊在內容上，滑不到最底 */}
           <PageTransition effect="fade" pageKey={pageKey} className="min-h-full md:h-full">
             {view === 'today' && <TodayView />}
-            {view === 'category' && categoryId !== null && <CategoryView key={categoryId} categoryId={categoryId} />}
+            {view === 'category' && <CategoryView key={categoryId ?? 'none'} categoryId={categoryId} />}
             {view === 'calendar' && <CalendarView mode={calendarMode} onModeChange={changeCalendarMode} />}
             {view === 'habits' && <HabitsView />}
             {view === 'schedule' && <ScheduleView />}

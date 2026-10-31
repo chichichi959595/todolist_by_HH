@@ -10,18 +10,19 @@ import { TaskItem } from '../components/TaskItem'
 import { todayStr } from '../lib/date'
 import { useCategories, useCategoryTasks } from '../lib/queries'
 
-/** 分類頁：這個分類底下的所有任務 */
-export function CategoryView({ categoryId }: { categoryId: number }) {
+/** 分類頁：這個分類底下的所有任務；categoryId 是 null 時是「未分類」，列出沒有分類的任務 */
+export function CategoryView({ categoryId }: { categoryId: number | null }) {
   const { data: categories, isPending: loadingCategories } = useCategories()
   const { data: tasks = [], isPending } = useCategoryTasks(categoryId)
   const [taskDialog, setTaskDialog] = useState<{ task: Task | null } | null>(null)
   const [editing, setEditing] = useState(false)
 
+  const uncategorized = categoryId === null
   const category = categories?.find((c) => c.id === categoryId)
   const open = tasks.filter((t) => !t.done)
   const done = tasks.filter((t) => t.done)
 
-  if (!loadingCategories && !category) {
+  if (!uncategorized && !loadingCategories && !category) {
     return <p className="p-8 text-muted-foreground">找不到這個分類，可能已經被刪除了</p>
   }
 
@@ -29,11 +30,19 @@ export function CategoryView({ categoryId }: { categoryId: number }) {
     <div className="flex flex-col px-3 py-3 md:h-full md:px-8 md:py-4">
       <div className="rounded-2xl border bg-card px-4 py-6 min-[760px]:px-10 min-[760px]:py-8 text-card-foreground shadow-xs md:min-h-0 md:flex-1 md:overflow-y-auto">
         <div className="mb-6 flex items-center gap-3 px-1">
-          <span aria-hidden="true" className="size-5 shrink-0 rounded-full" style={{ background: category?.color }} />
-          <h1 className="min-w-0 truncate text-2xl font-semibold tracking-tight">{category?.name ?? '分類'}</h1>
-          <Button variant="ghost" size="icon" onClick={() => setEditing(true)} aria-label="編輯分類" title="編輯分類">
-            <PencilIcon />
-          </Button>
+          {uncategorized ? (
+            <span aria-hidden="true" className="size-5 shrink-0 rounded-full border-[3px] border-muted-foreground/50" />
+          ) : (
+            <span aria-hidden="true" className="size-5 shrink-0 rounded-full" style={{ background: category?.color }} />
+          )}
+          <h1 className="min-w-0 truncate text-2xl font-semibold tracking-tight">
+            {uncategorized ? '未分類' : (category?.name ?? '分類')}
+          </h1>
+          {!uncategorized && (
+            <Button variant="ghost" size="icon" onClick={() => setEditing(true)} aria-label="編輯分類" title="編輯分類">
+              <PencilIcon />
+            </Button>
+          )}
           {/* 和習慣頁一樣，往右上推回和其他頁面一樣的位置 */}
           <Button onClick={() => setTaskDialog({ task: null })} className="ml-auto shrink-0 min-[760px]:relative min-[760px]:-top-2 min-[760px]:-right-5">
             <PlusIcon />
@@ -49,7 +58,13 @@ export function CategoryView({ categoryId }: { categoryId: number }) {
           {isPending ? (
             <p className="px-3 py-2 text-muted-foreground">載入中…</p>
           ) : open.length === 0 ? (
-            <p className="px-3 py-2 text-muted-foreground">{done.length > 0 ? '這個分類的任務都完成了' : '這個分類還沒有任務'}</p>
+            <p className="px-3 py-2 text-muted-foreground">
+              {done.length > 0
+                ? `${uncategorized ? '未分類' : '這個分類'}的任務都完成了`
+                : uncategorized
+                  ? '沒有未分類的任務'
+                  : '這個分類還沒有任務'}
+            </p>
           ) : (
             <ul className="space-y-0.5">
               {open.map((t) => (
@@ -76,12 +91,14 @@ export function CategoryView({ categoryId }: { categoryId: number }) {
         task={taskDialog?.task}
         defaults={{ date: todayStr(), categoryId }}
       />
-      <CategoryDialog
-        open={editing}
-        onClose={() => setEditing(false)}
-        category={category}
-        onDeleted={() => (window.location.hash = 'today')}
-      />
+      {!uncategorized && (
+        <CategoryDialog
+          open={editing}
+          onClose={() => setEditing(false)}
+          category={category}
+          onDeleted={() => (window.location.hash = 'today')}
+        />
+      )}
     </div>
   )
 }

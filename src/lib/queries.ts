@@ -33,7 +33,8 @@ export function useRangeTasks(range: { from: string; to: string } | null) {
   })
 }
 
-export function useCategoryTasks(categoryId: number) {
+/** categoryId 是 null 就是沒有分類的任務 */
+export function useCategoryTasks(categoryId: number | null) {
   return useQuery({ queryKey: [...TASKS, 'category', categoryId], queryFn: () => api.tasksInCategory(categoryId) })
 }
 
