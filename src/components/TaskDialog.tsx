@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { TaskCreateInput } from '../../shared/schemas'
 import type { Task } from '../../shared/types'
-import { PRIORITIES } from '../lib/date'
+import { PRIORITIES, todayStr } from '../lib/date'
 import { useCategories, useTaskMutations } from '../lib/queries'
 import { isOvernight } from '../lib/taskTime'
 import { Button } from '@/components/ui/button'
@@ -43,7 +43,9 @@ function TaskForm({
   const [title, setTitle] = useState(task?.title ?? defaults?.title ?? '')
   const [notes, setNotes] = useState(task?.notes ?? '')
   const [date, setDate] = useState(task?.date ?? defaults?.date ?? '')
-  const [allDay, setAllDay] = useState(initialStart === null)
+  // 留空 = 沒有期限；跟全天互斥，勾掉時保留原本選的日期
+  const [noDate, setNoDate] = useState(date === '')
+  const [allDay, setAllDay] = useState(initialStart === null && date !== '')
   const [startTime, setStartTime] = useState(initialStart ?? '09:00')
   const [endTime, setEndTime] = useState(task?.endTime ?? defaults?.endTime ?? '')
   const [priority, setPriority] = useState(task?.priority ?? defaults?.priority ?? 0)
@@ -52,7 +54,24 @@ function TaskForm({
   const [done, setDone] = useState(task?.done ?? false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const timed = date !== '' && !allDay
+  const timed = !noDate && !allDay
+
+  function pickNoDate(v: boolean) {
+    setNoDate(v)
+    if (v) setAllDay(false)
+    else if (!date) setDate(todayStr())
+  }
+
+  function pickAllDay(v: boolean) {
+    setAllDay(v)
+    if (v) pickNoDate(false)
+  }
+
+  function changeDate(value: string) {
+    setDate(value)
+    if (!value) pickNoDate(true)
+  }
+
   // 結束早於開始就是隔天結束（跨夜）；只有一樣的時間不行
   const timeError = timed && endTime !== '' && endTime === startTime ? '結束時間不能跟開始時間一樣' : null
   const overnight = timed && !timeError && isOvernight({ startTime, endTime: endTime || null })
@@ -64,7 +83,7 @@ function TaskForm({
     const payload = {
       title: title.trim(),
       notes,
-      date: date || null,
+      date: noDate ? null : date,
       startTime: timed ? startTime : null,
       endTime: timed && endTime ? endTime : null,
       priority,
@@ -94,12 +113,16 @@ function TaskForm({
         className="h-10 text-base"
       />
 
-      <div className="grid grid-cols-[1fr_auto] items-end gap-3">
-        <Field label="日期（留空 = 未排程）">
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      <div className="grid grid-cols-[minmax(0,12rem)_auto_auto_1fr] items-end gap-3">
+        <Field label="日期">
+          <Input type="date" value={noDate ? '' : date} disabled={noDate} onChange={(e) => changeDate(e.target.value)} />
         </Field>
         <Label className="h-8">
-          <Checkbox checked={allDay} disabled={!date} onCheckedChange={(v) => setAllDay(v === true)} />
+          <Checkbox checked={noDate} onCheckedChange={(v) => pickNoDate(v === true)} />
+          留空
+        </Label>
+        <Label className="h-8">
+          <Checkbox checked={allDay} onCheckedChange={(v) => pickAllDay(v === true)} />
           全天
         </Label>
       </div>
