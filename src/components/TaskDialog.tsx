@@ -113,15 +113,18 @@ function TaskForm({
         className="h-10 text-base"
       />
 
-      <div className="grid grid-cols-[minmax(0,12rem)_auto_auto_1fr] items-end gap-3">
-        <Field label="日期">
-          <Input type="date" value={noDate ? '' : date} disabled={noDate} onChange={(e) => changeDate(e.target.value)} />
-        </Field>
-        <Label className="h-8">
+      {/* 日期欄撐開，留空／全天固定寬度不換行；iPad 的日期輸入框比較寬，用 flex 才不會擠到旁邊的勾選 */}
+      <div className="flex items-end gap-4">
+        <div className="min-w-0 flex-1 sm:max-w-48">
+          <Field label="日期">
+            <Input type="date" value={noDate ? '' : date} disabled={noDate} onChange={(e) => changeDate(e.target.value)} />
+          </Field>
+        </div>
+        <Label className="h-8 shrink-0 whitespace-nowrap">
           <Checkbox checked={noDate} onCheckedChange={(v) => pickNoDate(v === true)} />
           留空
         </Label>
-        <Label className="h-8">
+        <Label className="h-8 shrink-0 whitespace-nowrap">
           <Checkbox checked={allDay} onCheckedChange={(v) => pickAllDay(v === true)} />
           全天
         </Label>

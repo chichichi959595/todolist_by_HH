@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils'
 import { CategoryDialog } from './components/CategoryDialog'
 import { HabitDialog } from './components/HabitDialog'
+import { FormActions, Modal } from './components/Modal'
 import { useLogout, useMe } from './components/AuthGate'
 import { BookIcon, CalendarIcon, LogOutIcon, PlusIcon, RepeatIcon, SunIcon } from './components/icons'
 import { TaskDialog } from './components/TaskDialog'
@@ -314,6 +315,8 @@ export function App() {
 function AccountBar() {
   const { data } = useMe()
   const logout = useLogout()
+  // 登出鍵很小又在角落，容易誤按，先問一次
+  const [confirming, setConfirming] = useState(false)
   const email = data?.user?.email
   if (!email) return null
   return (
@@ -333,7 +336,7 @@ function AccountBar() {
             <Button
               variant="ghost"
               size="icon-sm"
-              onClick={() => logout.mutate()}
+              onClick={() => setConfirming(true)}
               disabled={logout.isPending}
               aria-label="登出"
             />
@@ -343,6 +346,23 @@ function AccountBar() {
         </TooltipTrigger>
         <TooltipContent side="right">登出</TooltipContent>
       </Tooltip>
+
+      <Modal open={confirming} onClose={() => setConfirming(false)} title="確定要登出嗎？">
+        <p className="text-sm text-muted-foreground">登出後要重新輸入帳號密碼才能再登入。</p>
+        <FormActions>
+          <div className="flex-1" />
+          <Button variant="ghost" autoFocus onClick={() => setConfirming(false)}>
+            取消
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={logout.isPending}
+            onClick={() => logout.mutate(undefined, { onSettled: () => setConfirming(false) })}
+          >
+            登出
+          </Button>
+        </FormActions>
+      </Modal>
     </div>
   )
 }

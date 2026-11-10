@@ -151,6 +151,18 @@
   [role='button'] {
     touch-action: manipulation;
   }
+  /* iPad／iPhone 的 Safari 用原生外觀畫日期、時間欄：高度不聽 h-8、空值時整個縮扁、文字置中，
+     跟旁邊的勾選對不齊。關掉原生外觀，讓它跟一般輸入框一樣高、靠左 */
+  input[type='date'],
+  input[type='time'] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type='date']::-webkit-date-and-time-value,
+  input[type='time']::-webkit-date-and-time-value {
+    min-height: 1.25em;
+    text-align: left;
+  }
   /* 不是 shadcn 元件的可聚焦元素（連結、日曆裡的按鈕）也要看得到焦點 */
   a:focus-visible,
   [role='button']:focus-visible,

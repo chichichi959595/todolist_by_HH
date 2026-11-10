@@ -15,6 +15,8 @@ import { addDays, format, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { courseOccurrences } from '../../shared/courses'
 import type { TaskUpdateInput } from '../../shared/schemas'
 import type { Course, CourseSession, Task } from '../../shared/types'
@@ -26,6 +28,7 @@ import { TaskDialog } from '../components/TaskDialog'
 import { useCourseColor } from '../lib/courses'
 import { PRIORITIES, toDateStr, todayStr, WEEKDAY_LABELS } from '../lib/date'
 import { useCategories, useCourses, useRangeTasks, useTaskMutations } from '../lib/queries'
+import { storage } from '../lib/storage'
 import { isOvernight, taskTimeLabel } from '../lib/taskTime'
 
 const VIEWS = 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
@@ -96,6 +99,13 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
   // 右邊欄：點了哪一天（預設今天），以及點了哪個項目
   const [day, setDay] = useState(todayStr)
   const [picked, setPicked] = useState<Picked>(null)
+  // 日曆上要不要畫課表；記在這台裝置上
+  const [showCourses, setShowCourses] = useState(() => storage.get('calendar.showCourses') !== 'false')
+  function toggleCourses(next: boolean) {
+    setShowCourses(next)
+    storage.set('calendar.showCourses', String(next))
+    if (!next && picked?.kind === 'course') setPicked(null)
+  }
 
   const { data: tasks = [] } = useRangeTasks(range)
   const { data: courses = [] } = useCourses()
@@ -154,7 +164,7 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
           allDay: !t.startTime,
         }
       })
-    if (!range) return taskEvents
+    if (!range || !showCourses) return taskEvents
 
     // 課表：有效期間內每週固定的課，不能拖，點了打開課程
     const courseEvents: EventInput[] = courseOccurrences(courses, range.from, range.to).map((o, i) => ({
@@ -168,7 +178,7 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
       extendedProps: { course: o.course, date: o.date, session: o.session },
     }))
     return [...courseEvents, ...taskEvents]
-  }, [tasks, courses, categories, courseColor, range, mode])
+  }, [tasks, courses, categories, courseColor, range, mode, showCourses])
 
   function handleDatesSet(info: DatesSetArg) {
     // FullCalendar 的 end 是不含的那一天
@@ -337,7 +347,9 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
           day={day}
           picked={picked}
           tasks={tasks}
-          courses={courses}
+          courses={showCourses ? courses : []}
+          showCourses={showCourses}
+          onShowCoursesChange={toggleCourses}
           onPick={setPicked}
           onNewTask={() => setDialog({ task: null })}
           onEditTask={(task) => setDialog({ task })}
@@ -369,8 +381,12 @@ function DayPanel({
   onEditTask,
   onEditCourse,
   modeSwitch,
+  showCourses,
+  onShowCoursesChange,
 }: {
   modeSwitch: ReactNode
+  showCourses: boolean
+  onShowCoursesChange: (show: boolean) => void
   day: string
   picked: Picked
   tasks: Task[]
@@ -439,6 +455,11 @@ function DayPanel({
         </Button>
       </div>
 
+      <Label className="mb-4 justify-end px-1 font-normal text-muted-foreground">
+        <Checkbox checked={showCourses} onCheckedChange={(v) => onShowCoursesChange(v === true)} />
+        顯示課表
+      </Label>
+
       {task && <TaskDetail task={task} onEdit={() => onEditTask(task)} className="mb-6" />}
       {course && picked?.kind === 'course' && (
         <CourseDetail
@@ -456,7 +477,7 @@ function DayPanel({
         {rows.length > 0 && <span className="text-[13px] font-medium text-muted-foreground">{rows.length}</span>}
       </h2>
       {rows.length === 0 ? (
-        <p className="px-1 text-muted-foreground">這天沒有課也沒有任務</p>
+        <p className="px-1 text-muted-foreground">{showCourses ? '這天沒有課也沒有任務' : '這天沒有任務'}</p>
       ) : (
         <ul className="space-y-1">
           {rows.map((r) => (

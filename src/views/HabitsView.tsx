@@ -36,8 +36,8 @@ export function HabitsView() {
       <div className="@container flex flex-col rounded-2xl border bg-card p-4 text-card-foreground shadow-xs md:min-h-0 md:flex-1 md:overflow-y-auto md:p-6">
         <div className="flex min-h-0 flex-1 flex-col gap-6 @min-[900px]:flex-row">
           <div className="min-w-0 flex-1 @min-[900px]:overflow-y-auto">
-            {/* 手機版不顯示「星期X」標題，星期切換移到最上面取代它 */}
-            <WeekdaySegment day={day} onChange={setDay} className="mb-4 md:hidden" />
+            {/* 卡片窄、上下排時（手機、平板）星期切換放最上面；左右並排時才放到右邊欄 */}
+            <WeekdaySegment day={day} onChange={setDay} className="mb-4 @min-[900px]:hidden" />
             {isPending ? (
               <p className="px-3 text-muted-foreground">載入中…</p>
             ) : active.length === 0 ? (
@@ -67,7 +67,7 @@ export function HabitsView() {
                 新增習慣
               </Button>
             </div>
-            <WeekdaySegment day={day} onChange={setDay} className="mb-4 max-md:hidden" />
+            <WeekdaySegment day={day} onChange={setDay} className="mb-4 hidden @min-[900px]:block" />
             {picked ? (
               <HabitDetail habit={picked} today={today} onEdit={() => setDialog({ habit: picked })} />
             ) : (
