@@ -148,7 +148,8 @@ function TaskForm({
             deselectable
             draggable={false}
             size="field"
-            radius={12}
+            // 跟下拉選單的 rounded-xl 一樣：--radius 1rem × 1.4
+            radius={22.4}
             trackColor="transparent"
             thumbColor="var(--primary)"
             textColor="var(--foreground)"
