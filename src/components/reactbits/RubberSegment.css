@@ -119,3 +119,15 @@
     transition: opacity 160ms ease;
   }
 }
+
+/* 中間一條分隔線（兩格時用）；滑塊在上面，選到時會蓋住 */
+.rubber-segment.rubber-segment--divided::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 1px;
+  background: var(--border);
+  pointer-events: none;
+}

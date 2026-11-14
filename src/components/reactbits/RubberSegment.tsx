@@ -28,6 +28,8 @@ const SIZES = {
   sm: { height: 28, font: 12, pad: 10, min: 36 },
   md: { height: 36, font: 13, pad: 14, min: 44 },
   lg: { height: 44, font: 14, pad: 18, min: 48 },
+  // 外框 1px 時總高 40，跟表單裡的下拉選單一樣高
+  field: { height: 38, font: 14, pad: 14, min: 44 },
 }
 
 type Slot = { l: number; r: number }
@@ -82,6 +84,7 @@ export default function RubberSegment({
   speed = 1,
   glide = 75,
   draggable = true,
+  deselectable = false,
   disabled = false,
   className = '',
   'aria-label': ariaLabel = 'Segmented control',
@@ -103,6 +106,8 @@ export default function RubberSegment({
   speed?: number
   glide?: number
   draggable?: boolean
+  /** 再點一次已選的那格會取消選取，onChange 收到空字串；value 對不到任何一格時滑塊會淡出 */
+  deselectable?: boolean
   disabled?: boolean
   className?: string
   'aria-label'?: string
@@ -110,10 +115,9 @@ export default function RubberSegment({
   const list = items.map((item) => (typeof item === 'string' ? { value: item, label: item, icon: undefined } : item))
   const [inner, setInner] = useState(defaultValue ?? list[0]?.value)
   const current = value !== undefined ? value : inner
-  const index = Math.max(
-    0,
-    list.findIndex((item) => item.value === current),
-  )
+  const found = list.findIndex((item) => item.value === current)
+  const empty = deselectable && found < 0
+  const index = Math.max(0, found)
   const reduce = useReducedMotion()
 
   const trackRef = useRef<HTMLDivElement>(null)
@@ -170,7 +174,7 @@ export default function RubberSegment({
   }, [listKey, size, inset, equalSlots])
 
   useEffect(() => {
-    if (!drag.current && committed.current !== index) {
+    if (!drag.current && !empty && committed.current !== index) {
       committed.current = index
       jumpTo(index)
     }
@@ -187,7 +191,7 @@ export default function RubberSegment({
 
   const commit = (i: number) => {
     committed.current = i
-    if (i === index) return
+    if (i === index && !empty) return
     if (value === undefined) setInner(list[i].value)
     onChange?.(list[i].value, i)
   }
@@ -243,7 +247,7 @@ export default function RubberSegment({
       /* 拿不到 capture 也沒關係 */
     }
     const x = localX(e)
-    const onThumb = draggable && x >= edgeL.get() && x <= edgeR.get()
+    const onThumb = draggable && !empty && x >= edgeL.get() && x <= edgeR.get()
     drag.current = { id: e.pointerId, x0: x, slot: i, onThumb, live: false, offset: 0, w: 0, hist: [[e.timeStamp, x]] }
     if (onThumb) {
       clearTimeout(handoff.current)
@@ -302,10 +306,18 @@ export default function RubberSegment({
     release()
     const x = localX(e)
     if (!d.live) {
-      if (Math.abs(x - d.x0) <= SLOP && d.slot !== committed.current) {
+      if (Math.abs(x - d.x0) > SLOP) return
+      if (empty) {
+        // 原本沒選：滑塊直接在點的那格淡入
+        commit(d.slot)
+        jumpTo(d.slot)
+      } else if (d.slot !== committed.current) {
         const from = committed.current
         commit(d.slot)
         travel(from, d.slot)
+      } else if (deselectable) {
+        if (value === undefined) setInner('')
+        onChange?.('', -1)
       }
       return
     }
@@ -337,7 +349,7 @@ export default function RubberSegment({
     else if (e.key === 'End') next = last
     if (next === null) return
     e.preventDefault()
-    if (next === index) return
+    if (next === index && !empty) return
     commit(next)
     jumpTo(next)
     itemRefs.current[next]?.focus()
@@ -382,7 +394,7 @@ export default function RubberSegment({
           }}
           type="button"
           role="radio"
-          aria-checked={i === index}
+          aria-checked={i === index && !empty}
           tabIndex={i === index ? 0 : -1}
           disabled={disabled}
           className="rubber-segment__item"
@@ -393,7 +405,14 @@ export default function RubberSegment({
           {item.label}
         </button>
       ))}
-      <motion.div className="rubber-segment__thumb" aria-hidden="true" style={{ clipPath }}>
+      <motion.div
+        className="rubber-segment__thumb"
+        aria-hidden="true"
+        style={{ clipPath }}
+        initial={false}
+        animate={{ opacity: empty ? 0 : 1 }}
+        transition={{ duration: reduce ? 0 : t(0.16) }}
+      >
         {list.map((item) => (
           <span key={item.value} className="rubber-segment__item rubber-segment__copy">
             {item.icon}

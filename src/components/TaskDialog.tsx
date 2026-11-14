@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ChoiceCombobox } from '@/components/ui/choice-combobox'
 import { Field, FormActions, Modal } from './Modal'
-import { cn } from '@/lib/utils'
+import RubberSegment from './reactbits/RubberSegment'
 
 interface TaskDialogProps {
   open: boolean
@@ -66,6 +66,13 @@ function TaskForm({
   function pickAllDay(v: boolean) {
     setAllDay(v)
     if (v) pickNoDate(false)
+  }
+
+  function pickMode(mode: string) {
+    if (mode === 'none') pickNoDate(true)
+    else if (mode === 'allDay') pickAllDay(true)
+    else if (noDate) pickNoDate(false)
+    else setAllDay(false)
   }
 
   function changeDate(value: string) {
@@ -128,9 +135,26 @@ function TaskForm({
             />
           </Field>
         </div>
-        <div role="radiogroup" aria-label="期限" className="flex h-10 items-center justify-between">
-          <RadioPill label="留空" checked={noDate} onChange={pickNoDate} />
-          <RadioPill label="全天" checked={allDay} onChange={pickAllDay} />
+        {/* 跟重要程度一樣的框，中間一條線；兩格互斥，再點一次已選的那格就取消，回到指定時間 */}
+        <div className="rounded-xl dark:bg-input/30">
+          <RubberSegment
+            className="rubber-segment--divided w-full border border-input"
+            items={[
+              { value: 'none', label: '留空' },
+              { value: 'allDay', label: '全天' },
+            ]}
+            value={noDate ? 'none' : allDay ? 'allDay' : ''}
+            onChange={pickMode}
+            deselectable
+            draggable={false}
+            size="field"
+            radius={12}
+            trackColor="transparent"
+            thumbColor="var(--primary)"
+            textColor="var(--foreground)"
+            activeTextColor="var(--primary-foreground)"
+            aria-label="期限"
+          />
         </div>
       </div>
 
@@ -203,26 +227,3 @@ function TaskForm({
   )
 }
 
-/** 圓形單選鈕的樣子，但再點一次可以取消（兩個都不選 = 指定時間） */
-function RadioPill({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className="flex items-center gap-2 rounded-md text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-    >
-      <span
-        aria-hidden="true"
-        className={cn(
-          'grid size-4 place-items-center rounded-full border transition-colors',
-          checked ? 'border-primary' : 'border-input dark:bg-input/30',
-        )}
-      >
-        {checked && <span className="size-2 rounded-full bg-primary" />}
-      </span>
-      {label}
-    </button>
-  )
-}
