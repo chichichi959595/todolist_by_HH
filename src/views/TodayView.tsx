@@ -237,7 +237,7 @@ export function TodayView() {
         </div>
       </section>
 
-      <TaskDialog open={dialogOpen} onClose={() => setDialogOpen(false)} task={editing} defaults={{ date: today }} />
+      <TaskDialog open={dialogOpen} onClose={() => setDialogOpen(false)} task={editing} />
       <HabitDialog open={editingHabit !== null} onClose={() => setEditingHabit(null)} habit={editingHabit} />
       <CourseDialog open={editingCourse !== null} onClose={() => setEditingCourse(null)} course={editingCourse} />
     </div>

@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import type { Task } from '../../shared/types'
 import { CategoryDialog } from '../components/CategoryDialog'
 import { Disclosure } from '../components/blocks'
-import { PencilIcon, PlusIcon } from '../components/icons'
+import { PencilIcon, PlusIcon, SearchIcon, XIcon } from '../components/icons'
 import { TaskDialog } from '../components/TaskDialog'
 import { TaskItem } from '../components/TaskItem'
-import { todayStr } from '../lib/date'
 import { useCategories, useCategoryTasks } from '../lib/queries'
 
 /** 分類頁：這個分類底下的所有任務；categoryId 是 null 時是「未分類」，列出沒有分類的任務 */
@@ -16,11 +16,21 @@ export function CategoryView({ categoryId }: { categoryId: number | null }) {
   const { data: tasks = [], isPending } = useCategoryTasks(categoryId)
   const [taskDialog, setTaskDialog] = useState<{ task: Task | null } | null>(null)
   const [editing, setEditing] = useState(false)
+  const [query, setQuery] = useState('')
 
   const uncategorized = categoryId === null
   const category = categories?.find((c) => c.id === categoryId)
-  const open = tasks.filter((t) => !t.done)
-  const done = tasks.filter((t) => t.done)
+  // 搜尋標題和備註，不分大小寫；空白隔開的每個字都要符合
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const searching = words.length > 0
+  const matched = searching
+    ? tasks.filter((t) => {
+        const text = `${t.title}\n${t.notes}`.toLowerCase()
+        return words.every((w) => text.includes(w))
+      })
+    : tasks
+  const open = matched.filter((t) => !t.done)
+  const done = matched.filter((t) => t.done)
 
   if (!uncategorized && !loadingCategories && !category) {
     return <p className="p-8 text-muted-foreground">找不到這個分類，可能已經被刪除了</p>
@@ -50,6 +60,32 @@ export function CategoryView({ categoryId }: { categoryId: number | null }) {
           </Button>
         </div>
 
+        <div className="relative mb-5 px-1">
+          <SearchIcon
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Escape' && setQuery('')}
+            placeholder={`搜尋${uncategorized ? '未分類' : (category?.name ?? '這個分類')}的任務`}
+            aria-label="搜尋任務"
+            className="pr-9 pl-9 [&::-webkit-search-cancel-button]:hidden"
+          />
+          {searching && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="清除搜尋"
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+            >
+              <XIcon className="size-4" />
+            </button>
+          )}
+        </div>
+
         <section>
           <h2 className="mb-3 flex items-center gap-2 px-3 text-lg font-semibold tracking-tight">
             未完成
@@ -59,7 +95,11 @@ export function CategoryView({ categoryId }: { categoryId: number | null }) {
             <p className="px-3 py-2 text-muted-foreground">載入中…</p>
           ) : open.length === 0 ? (
             <p className="px-3 py-2 text-muted-foreground">
-              {done.length > 0
+              {searching
+                ? done.length > 0
+                  ? '符合的任務都完成了'
+                  : '找不到符合的任務'
+                : done.length > 0
                 ? `${uncategorized ? '未分類' : '這個分類'}的任務都完成了`
                 : uncategorized
                   ? '沒有未分類的任務'
@@ -89,7 +129,7 @@ export function CategoryView({ categoryId }: { categoryId: number | null }) {
         open={taskDialog !== null}
         onClose={() => setTaskDialog(null)}
         task={taskDialog?.task}
-        defaults={{ date: todayStr(), categoryId }}
+        defaults={{ categoryId }}
       />
       {!uncategorized && (
         <CategoryDialog

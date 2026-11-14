@@ -13,7 +13,6 @@ import { PageTransition } from './components/animate-ui/components/page-transiti
 import { EyeTracker } from './components/bencho/EyeTracker'
 import { GlideList } from './components/GlideList'
 import { Toaster } from './components/Toaster'
-import { todayStr } from './lib/date'
 import { useCategories } from './lib/queries'
 import { storage } from './lib/storage'
 import { CategoryView } from './views/CategoryView'
@@ -303,7 +302,7 @@ export function App() {
         ))}
       </nav>
 
-      <TaskDialog open={creating === 'task'} onClose={() => setCreating(null)} defaults={{ date: todayStr() }} />
+      <TaskDialog open={creating === 'task'} onClose={() => setCreating(null)} />
       <HabitDialog open={creating === 'habit'} onClose={() => setCreating(null)} />
       <CategoryDialog open={creating === 'category'} onClose={() => setCreating(null)} />
       <Toaster />

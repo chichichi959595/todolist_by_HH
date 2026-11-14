@@ -11,6 +11,7 @@ export {
   PencilIcon,
   PlusIcon,
   RepeatIcon,
+  SearchIcon,
   SlidersHorizontalIcon as SlidersIcon,
   SunIcon,
   XIcon,
