@@ -73,8 +73,8 @@ export function CourseDialog({ open, onClose, course, session }: CourseDialogPro
 
 /** 列在課程清單、彈窗等地方的時段摘要：「一 09:00–11:00、四 13:00–15:00」 */
 export const sessionsLabel = (sessions: CourseSession[]) =>
-  [...sessions]
-    .sort((a, b) => WEEKDAY_ORDER.indexOf(a.weekday) - WEEKDAY_ORDER.indexOf(b.weekday) || a.startTime.localeCompare(b.startTime))
+  sessions
+    .toSorted((a, b) => WEEKDAY_ORDER.indexOf(a.weekday) - WEEKDAY_ORDER.indexOf(b.weekday) || a.startTime.localeCompare(b.startTime))
     .map((s) => `${WEEKDAY_LABELS[s.weekday]} ${s.startTime}–${s.endTime}`)
     .join('、')
 

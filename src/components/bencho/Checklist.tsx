@@ -462,7 +462,13 @@ export function Checklist({
                  detail overlay, which is not what somebody
                  backing out of a text field is asking for */
               onKeyDown={(e) => {
-                if (e.key === "Enter") { e.stopPropagation(); add(); }
+                if (e.key === "Enter") {
+                  e.stopPropagation();
+                  /* 注音等輸入法按 Enter 是在選字，不是送出；
+                     Safari 的 isComposing 會提早變 false，所以再看 keyCode 229 */
+                  if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+                  add();
+                }
                 if (e.key === "Escape") {
                   e.stopPropagation();
                   setAdding(false);

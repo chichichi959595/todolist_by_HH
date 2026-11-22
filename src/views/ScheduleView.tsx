@@ -70,7 +70,7 @@ export function ScheduleView() {
   const occurrences = courseOccurrences(courses, from, to)
 
   // 已結束的課程排在最後
-  const sorted = [...courses].sort(
+  const sorted = courses.toSorted(
     (a, b) => Number(today > a.endDate) - Number(today > b.endDate) || a.startDate.localeCompare(b.startDate),
   )
 
