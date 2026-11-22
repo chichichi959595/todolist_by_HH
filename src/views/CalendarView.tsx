@@ -282,7 +282,7 @@ export function CalendarView({ mode, onModeChange }: CalendarViewProps) {
     <div className="flex flex-col px-3 py-3 md:h-full md:px-8 md:py-4">
       <h1 className="sr-only">日曆</h1>
       {/* 跟課表一樣：左邊日曆、右邊資訊欄。看卡片自己的寬度決定並排或上下排 */}
-      <div className="cal-card @container flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-2.5 text-card-foreground shadow-xs md:overflow-y-auto md:p-6">
+      <div className="cal-card @container flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-2.5 text-card-foreground shadow-xs md:overflow-y-auto md:p-6 md:pt-8">
         <div className="flex min-h-0 flex-1 flex-col gap-6 @min-[900px]:flex-row">
         {/* 手機版外層不再撐滿畫面，FullCalendar 的 height="100%" 要有固定高度可以參照 */}
         <div className="relative flex min-h-[640px] min-w-0 flex-1 flex-col max-md:h-[640px] max-md:flex-none @min-[900px]:min-h-0">

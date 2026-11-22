@@ -33,7 +33,7 @@ export function HabitsView() {
     <div className="flex flex-col px-3 py-3 md:h-full md:px-8 md:py-4">
       <h1 className="sr-only">習慣</h1>
       {/* 跟日曆、課表一樣：左邊這天的習慣表、右邊點到的習慣的資訊。看卡片自己的寬度決定並排或上下排 */}
-      <div className="@container flex flex-col rounded-2xl border bg-card p-4 text-card-foreground shadow-xs md:min-h-0 md:flex-1 md:overflow-y-auto md:p-6">
+      <div className="@container flex flex-col rounded-2xl border bg-card p-4 text-card-foreground shadow-xs md:min-h-0 md:flex-1 md:overflow-y-auto md:p-6 md:pt-8">
         <div className="flex min-h-0 flex-1 flex-col gap-6 @min-[900px]:flex-row">
           <div className="min-w-0 flex-1 @min-[900px]:overflow-y-auto">
             {/* 卡片窄、上下排時（手機、平板）星期切換放最上面；左右並排時才放到右邊欄 */}
@@ -123,7 +123,8 @@ function HabitSection({
     <section>
       {/* 寬版時標題跟右邊的新增鈕同一行，整塊高度等於「新增鈕＋星期切換」，讓第一條習慣跟右邊卡片上緣對齊 */}
       <div className="mb-3 px-3 max-md:hidden @min-[900px]:mb-0 @min-[900px]:h-25">
-        <h2 className="flex items-center text-lg font-semibold tracking-tight @min-[900px]:h-9">{title}</h2>
+        {/* 字級跟分類頁的標題一樣 */}
+        <h2 className="flex items-center text-2xl font-semibold tracking-tight @min-[900px]:h-9">{title}</h2>
         <p className="text-sm text-muted-foreground">總共 {habits.length} 條習慣</p>
       </div>
       {habits.length === 0 ? (

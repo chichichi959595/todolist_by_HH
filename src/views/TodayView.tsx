@@ -193,8 +193,8 @@ export function TodayView() {
 
   return (
     <div className="flex flex-col px-3 py-3 md:h-full md:px-8 md:py-4">
-      <header className="shrink-0 rounded-2xl border bg-card px-5 py-5 text-card-foreground shadow-xs md:px-6 md:pt-6">
-        {/* 新增鈕貼齊卡片內距的右上角，和其他頁面的新增鈕同一個位置 */}
+      <header className="shrink-0 rounded-2xl border bg-card px-5 py-5 text-card-foreground shadow-xs md:px-6 md:pt-8">
+        {/* 新增鈕在卡片上緣 32px、右緣 24px，和分類頁跟標題對齊的新增鈕同一個位置 */}
         <div className="flex items-center justify-between gap-4 md:items-start">
           <h1 className="min-w-0 text-xl leading-tight font-semibold tracking-tight whitespace-nowrap min-[400px]:text-2xl md:text-3xl">
             <span className="sr-only">今天，</span>

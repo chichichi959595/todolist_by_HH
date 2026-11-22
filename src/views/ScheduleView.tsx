@@ -91,7 +91,7 @@ export function ScheduleView() {
       {/* 版面看卡片自己的寬度（container query），不看整個視窗：
           瀏覽器開了側邊欄、視窗變窄時，只要卡片放得下就維持左右並排；
           放不下才把課程清單排到課表下面，這時整張卡片可以捲動 */}
-      <div className="@container rounded-2xl border bg-card text-card-foreground shadow-xs flex flex-col px-4 py-5 md:min-h-0 md:flex-1 md:overflow-y-auto md:px-6 md:py-6">
+      <div className="@container rounded-2xl border bg-card text-card-foreground shadow-xs flex flex-col px-4 py-5 md:min-h-0 md:flex-1 md:overflow-y-auto md:px-6 md:pt-8 md:pb-6">
         <div className="flex min-h-0 flex-1 flex-col gap-6 @min-[640px]:flex-row">
           {/* 週課表 */}
           <div className="flex min-h-[720px] flex-1 flex-col overflow-hidden rounded-xl border @min-[640px]:min-h-0">
